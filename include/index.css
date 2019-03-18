@@ -1,0 +1,16 @@
+body {
+	display: flex;
+	flex-direction: column;
+}
+
+header {
+	background-color: rgb(255, 0, 0);
+}
+
+.home {
+	float: left;
+}
+
+.login {
+	float: right;
+}
