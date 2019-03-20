@@ -1,0 +1,1 @@
+INSERT INTO users (email, name, password, role) VALUES ("admin@restomatic", "admin","admin","admin")

@@ -1,4 +1,5 @@
 <?php require 'include/config.php' ?>
+<?php session_destroy(); ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,9 +11,7 @@
 <body>
 <?php require("include/common/header.php"); ?>
 
-<h1> Take a look at our restaurants </h1>
-
-<p> Here we generate a list of websites for the restaurants
+<h1> See you soon </h1>
 
 </body>
 
