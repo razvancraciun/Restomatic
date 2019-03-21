@@ -6,5 +6,5 @@
 - Owner page(after login)
 - Restaurant site sketches
 - Restaurant template
-- Fix register bug
+- ~~Fix register bug~~ DONE
 - Anything more??
