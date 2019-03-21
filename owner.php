@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title> Your restaurants </title>
-<link rel="stylesheet" type="text/css" href="include/index.css">
+<link rel="stylesheet" type="text/css" href="include/css/index.css">
+<link rel="stylesheet" type="text/css" href="include/css/header.css">
 </head>
 
 <body>

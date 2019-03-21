@@ -3,5 +3,5 @@ CREATE TABLE `Restomatic`.`users` (
     `name` VARCHAR(100) NOT NULL , 
     `password` VARCHAR(100) NOT NULL , 
     `role` VARCHAR(30) NOT NULL , 
-    `id` INT NOT NULL , 
+    `id` INT AUTO_INCREMENT , 
     PRIMARY KEY (`id`), UNIQUE (`email`)) ENGINE = InnoDB;

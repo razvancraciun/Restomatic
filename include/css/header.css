@@ -1,0 +1,48 @@
+header {
+	width: 90%;
+	display: flex;
+	background-color: rgb(255, 0, 0);
+	justify-content: space-between;
+}
+
+header a:hover {
+	text-decoration-line: underline;
+}
+
+header a {
+	color: white;
+	font-weight: bolder;
+	text-decoration-line: none;
+}
+
+.home {
+	float: left;
+	margin: 10px;
+	margin-left: 3%;
+}
+
+.headerLogin {
+	float: right;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-right: 3%;
+}
+
+.headerWelcomeText {
+	display: flex;
+	justify-content: center;
+}
+
+.headerLoginButton {
+	margin: 10px;
+}
+
+.headerRegisterButton {
+	margin: 10px;
+}
+
+.headerLogoutButton {
+	margin: 10px;
+	align-self: center;
+}

@@ -24,7 +24,6 @@ class User {
     }
 
     public function checkPassword($password) {
-        echo password_hash($password, PASSWORD_DEFAULT);
         return password_verify($password,$this->password);
     }
 
@@ -32,8 +31,9 @@ class User {
         $user=User::searchUser($email);
         if($user!=null &&  $user->checkPassword($password)) {
             $_SESSION['login'] = true;
-            $_SESSION['name'] = $email;
-            $_SESSION['isAdmin'] = strcmp($fila['role'], 'admin') == 0 ? true : false;
+            $_SESSION['email'] = $email;
+            $_SESSION['isAdmin'] = strcmp($user->role, 'admin') == 0 ? true : false;
+            $_SESSION['name'] = $user->name;
             header('Location: index.php');
            return $user;
         }
@@ -43,16 +43,21 @@ class User {
 
     public static function create($email,$name,$password,$role) {
         require_once(__DIR__."/Application.php");
-        $conn=Aplicacion::getInstance()->connectDB();
+        $conn=Application::getInstance()->connectDB();
         $query=sprintf("INSERT INTO users(email, name, password, role) VALUES('%s', '%s', '%s', '%s')"
 					, $conn->real_escape_string($email)
 					, $conn->real_escape_string($name)
 					, password_hash($password, PASSWORD_DEFAULT)
                     , 'user');
+                    echo 'query ok';
         if ( $conn->query($query) ) {
+           
             $_SESSION['login'] = true;
             $_SESSION['email'] = $email;
+            $_SESSION['name'] = $name;
+            
             header('Location: index.php');
+           
             return true;
         }
         else {
