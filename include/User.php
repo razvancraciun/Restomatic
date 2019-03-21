@@ -34,7 +34,7 @@ class User {
             $_SESSION['email'] = $email;
             $_SESSION['isAdmin'] = strcmp($user->role, 'admin') == 0 ? true : false;
             $_SESSION['name'] = $user->name;
-            header('Location: index.php');
+            header('Location: owner.php');
            return $user;
         }
         else return false;
@@ -56,7 +56,7 @@ class User {
             $_SESSION['email'] = $email;
             $_SESSION['name'] = $name;
             
-            header('Location: index.php');
+            header('Location: owner.php');
            
             return true;
         }
