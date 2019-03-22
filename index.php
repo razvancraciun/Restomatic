@@ -1,4 +1,4 @@
-<?php require 'include/config.php' ?>
+<?php require_once 'include/config.php' ?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,7 +15,9 @@
 <div class='content'>
     <h1> Take a look at our restaurants </h1>
 
-    <p> Here we generate a list of websites for the restaurants
+    <ul class="restaurantGrid">
+    <?php require 'include/fetchAllRestaurants.php' ?>
+    </ul>
 </div>
 </body>
 

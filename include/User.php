@@ -49,7 +49,6 @@ class User {
 					, $conn->real_escape_string($name)
 					, password_hash($password, PASSWORD_DEFAULT)
                     , 'user');
-                    echo 'query ok';
         if ( $conn->query($query) ) {
            
             $_SESSION['login'] = true;
@@ -63,5 +62,17 @@ class User {
         else {
             return false;
         }
+    }
+
+    public static function fetchMyRestaurants() {
+        require_once(__DIR__."/Application.php");
+        $conn=Application::getInstance()->connectDB();
+        if($_SESSION['login']) {
+            $query=sprintf("SELECT * FROM restaurants WHERE restaurants.owner= 
+            (SELECT id from users WHERE email='%s' )",$conn->real_escape_string($_SESSION['email']));
+            $result=$conn->query($query);
+            return $result;
+        }
+        return false;
     }
 }

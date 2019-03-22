@@ -15,10 +15,9 @@
 
     <p> List of the restaurants with edit buttons
     <p> + button for adding a new restaurant
-    <ul>
-    <li>rest1</li>
-    <li>rest2</li>
-    <li><a href="#">New Restaurant</a>
+    <ul class="restaurantList">
+    <?php require "include/fetchAllRestaurants.php" ?>
+    <li><a href="#" class="restaurantListItem">New Restaurant</a></li>
     </ul>
 </div>
 </body>
