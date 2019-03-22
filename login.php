@@ -1,4 +1,4 @@
-<?php require 'include/config.php'; ?>
+<?php require 'include/config.php';?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,13 +11,14 @@
 <body>
 <?php require("include/common/header.php"); ?>
 <div class="content">
-    <form action="processLogin.php" method="POST">
+    <form action="form.php" method="POST">
+      <input type="hidden" name="kind" value="login">
     <fieldset>
     <legend> Login </legend>
     <label for="emailInput">Email:</label><input type="email"  id="emailInput" name="emailInput" placeholder="Your email">
     <label for="passwordInput">Password:</label><input type="password" id="passwordInput" name="passwordInput" placeholder="Your password">
-    <input type="submit"> 
-    </fieldset>
+    <input type="submit">
+  </fieldset>
     </form>
 </div>
 </body>
