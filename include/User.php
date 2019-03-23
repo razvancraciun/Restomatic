@@ -11,7 +11,7 @@ class User {
     public static function searchUser($email) {
         require_once __DIR__.'/Application.php';
         $conn =Application::getInstance()->connectDB();
-	
+
 	    $query=sprintf("SELECT * FROM users U WHERE U.email = '%s'", $conn->real_escape_string($email));
         $rs = $conn->query($query);
         if($rs->num_rows==0) {
@@ -38,7 +38,7 @@ class User {
            return $user;
         }
         else return false;
-       
+
     }
 
     public static function create($email,$name,$password,$role) {
@@ -51,17 +51,21 @@ class User {
                     , 'user');
                     echo 'query ok';
         if ( $conn->query($query) ) {
-           
+
             $_SESSION['login'] = true;
             $_SESSION['email'] = $email;
             $_SESSION['name'] = $name;
-            
+
             header('Location: owner.php');
-           
+
             return true;
         }
         else {
             return false;
         }
+    }
+    public static function newRestaurant($name,$theme,$times,$logo,$address)
+    {
+
     }
 }
