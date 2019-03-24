@@ -1,7 +1,8 @@
 <header>
 
 <a href="index.php" class="home"> Home </a>
-<a href="newRestaurant.php" class="newRestaurant"> Test </a>
+<a href="newRestaurant.php" class="newRestaurant"> Test: Add </a>
+<a href="template.php" class = "template"> Test: Restaurant
 <?php
     if( isset($_SESSION['login']) && $_SESSION['login']) {
         echo '<div class="headerLogin"><span class="headerWelcomeText">
