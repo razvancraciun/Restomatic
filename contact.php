@@ -13,7 +13,7 @@
 <?php require("include/common/template_header.php"); ?>
 
 <div class="container">
-  <form action="form.php">
+  <form action="processContact.php" method="POST">
 
     <label for="fname">First Name</label>
     <input type="text" id="fname" name="firstname" placeholder="Your name..">
