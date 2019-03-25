@@ -1,1 +1,0 @@
-<?php require 'include/processRegister.php'; ?>

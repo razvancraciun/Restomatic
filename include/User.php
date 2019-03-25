@@ -11,7 +11,7 @@ class User {
     public static function searchUser($email) {
         require_once __DIR__.'/Application.php';
         $conn =Application::getInstance()->connectDB();
-	
+
 	    $query=sprintf("SELECT * FROM users U WHERE U.email = '%s'", $conn->real_escape_string($email));
         $rs = $conn->query($query);
         if($rs->num_rows==0) {
@@ -38,7 +38,7 @@ class User {
            return $user;
         }
         else return false;
-       
+
     }
 
     public static function create($email,$name,$password,$role) {
@@ -50,13 +50,13 @@ class User {
 					, password_hash($password, PASSWORD_DEFAULT)
                     , 'user');
         if ( $conn->query($query) ) {
-           
+
             $_SESSION['login'] = true;
             $_SESSION['email'] = $email;
             $_SESSION['name'] = $name;
-            
+
             header('Location: owner.php');
-           
+
             return true;
         }
         else {
@@ -68,8 +68,8 @@ class User {
         require_once(__DIR__."/Application.php");
         $conn=Application::getInstance()->connectDB();
         if($_SESSION['login']) {
-            $query=sprintf("SELECT * FROM restaurants WHERE restaurants.owner= 
-            (SELECT id from users WHERE email='%s' )",$conn->real_escape_string($_SESSION['email']));
+            $query=sprintf("SELECT restaurants.id, restaurants.name FROM restaurants JOIN users ON users.id=restaurants.owner
+            WHERE users.email='%s';", $_SESSION['email']);
             $result=$conn->query($query);
             return $result;
         }

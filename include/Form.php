@@ -4,20 +4,20 @@
 * Base class for the management of forms.
 *
 * In addition to the basic management of the forms.
- */
+*/
 abstract class Form
 {
 
     /**
-     * @var string String used as the value of the "id" attribute of the & lt; form & gt; associated to the form and
-      * as a parameter to check to verify that the user has sent the form.
-     */
+    * @var string String used as the value of the "id" attribute of the & lt; form & gt; associated to the form and
+    * as a parameter to check to verify that the user has sent the form.
+    */
     private $formId;
 
     /**
-     * @var string URL associated with the "action" attribute of the & lt; form & gt; of the form and that will process the
-      * Form submission.
-     */
+    * @var string URL associated with the "action" attribute of the & lt; form & gt; of the form and that will process the
+    * Form submission.
+    */
     private $action;
 
     /**
@@ -175,7 +175,7 @@ class LoginForm extends Form {
     {
         return '<label for="emailInput">Email:</label><input type="email"  id="emailInput" name="emailInput" placeholder="Your email">
         <label for="passwordInput">Password:</label><input type="password" id="passwordInput" name="passwordInput" placeholder="Your password">
-        <input type="submit"> ';
+        <input type="submit" value="Login"> ';
     }
 
         /**
@@ -214,7 +214,15 @@ class RegisterForm extends Form {
      */
     protected function generaCamposFormulario($dataIniciales)
     {
-        return '';
+        return '<label for="emailInput">Email:</label>
+        <input type="email"  id="emailInput" name="emailInput" placeholder="Your email">
+        <label for="nameInput"> Name: </label>
+        <input type="text" id="nameInput" name="nameInput" placeholder="Your name">
+        <label for="passwordInput">Password:</label>
+        <input type="password" id="passwordInput" name="passwordInput" placeholder="Your password">
+        <label for="retypePassword">Repeat password:</label>
+        <input type="password" id="retypePassword" name="retypePassword" placeholder="Your password">
+        <input type="submit" value="Register">';
     }
 
         /**
@@ -228,6 +236,15 @@ class RegisterForm extends Form {
     */
     protected function processForm($data)
     {
+        require 'config.php';
+        if($data['passwordInput']==$data['retypePassword']) {
+            $user= User::create($_REQUEST['emailInput'],$_REQUEST['nameInput'],$_REQUEST['passwordInput'],'owner');
+        }
+        if(!$user) {
+            return array('User already exists', '');
+        }
+
+        return 'owner.php';
     }
 
 }
