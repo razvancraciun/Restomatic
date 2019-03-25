@@ -1,0 +1,27 @@
+fieldset {
+  position:relative
+  padding: 1em;
+  font:80%/1 sans-serif;
+  }
+label {
+  float:left;
+  width:25%;
+  margin-right:0.5em;
+  padding-top:0.2em;
+  text-align:right;
+  font-weight:bold;
+  }
+legend span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  }
+
+.logo{
+  float: right;
+
+}
+
+.menu{
+  float:right;
+}
