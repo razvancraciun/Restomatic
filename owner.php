@@ -9,7 +9,7 @@
 </head>
 
 <body>
-<?php require("include/common/header.php"); ?>
+<?php require(__DIR__."/include/common/header.php"); ?>
 <div class="content">
     <h1> Your restaurants </h1>
 
