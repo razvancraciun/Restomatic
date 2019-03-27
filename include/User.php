@@ -68,13 +68,13 @@ class User {
     public static function fetchMyRestaurants() {
         require_once(__DIR__."/Application.php");
         $conn=Application::getInstance()->connectDB();
-        if($_SESSION['login']) {
+        if(isset($_SESSION['login']) && $_SESSION['login']) {
             $query=sprintf("SELECT restaurants.id, restaurants.name, restaurants.logo FROM restaurants JOIN users ON users.id=restaurants.owner
             WHERE users.email='%s';", $_SESSION['email']);
             $result=$conn->query($query);
             return $result;
         }
-        return false;
+        return header("Location: notLoggedIn.php");
     }
 
     public static function addRestaurant($data,$files) {
