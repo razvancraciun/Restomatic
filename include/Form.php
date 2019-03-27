@@ -68,7 +68,7 @@ abstract class Form
         if ( ! $this->submittedForm($_POST) ) {
             echo $this->generateForm();
         } else {
-            $result = $this->processForm($_POST);
+            $result = $this->processForm($_POST,$_FILES);
             if ( is_array($result) ) {
                 echo $this->generateForm($result, $_POST);
             } else {
@@ -85,7 +85,7 @@ abstract class Form
      *
      * @return string HTML associated with the form fields.
      */
-    protected function generaCamposFormulario($dataIniciales)
+    protected function generateFormFields($dataIniciales)
     {
         return '';
     }
@@ -99,7 +99,7 @@ abstract class Form
      * you want to redirect the user, or an array with the errors that occurred during the processing of the form.
      *
      */
-    protected function processForm($data)
+    protected function processForm($data,$files)
     {
         return array();
     }
@@ -129,13 +129,16 @@ abstract class Form
     private function generateForm($errores = array(), &$data = array())
     {
 
-        $html= $this->generaListaErrores($errores);
+        $html="";
 
-        $html .= '<form method="POST" action="'.$this->action.'" id="'.$this->formId.'" >';
+        $html .= '<form method="POST" action="'.$this->action.'" id="'.$this->formId.'" enctype="multipart/form-data" >';
         $html .= '<fieldset>';
+        
         $html .= '<input type="hidden" name="action" value="'.$this->formId.'" />';
 
-        $html .= $this->generaCamposFormulario($data);
+        $html .= $this->generateErrorList($errores);
+        $html .= $this->generateFormFields($data);
+        
         $html .= '</fieldset>';
         $html .= '</form>';
         return $html;
@@ -148,12 +151,12 @@ abstract class Form
      *
      * @return string El HTML asociado a los mensajes de error.
      */
-    private function generaListaErrores($errores)
+    private function generateErrorList($errores)
     {
         $html='';
         $numErrores = count($errores);
         if (  $numErrores == 1 ) {
-            $html .= "<ul><li>".$errores[0]."</li></ul>";
+            $html .= "<ul class='formErrorList'><li>".$errores[0]."</li></ul>";
         } else if ( $numErrores > 1 ) {
             $html .= "<ul><li>";
             $html .= implode("</li><li>", $errores);
@@ -171,7 +174,7 @@ class LoginForm extends Form {
      *
      * @return string HTML associated with the form fields.
      */
-    protected function generaCamposFormulario($dataIniciales)
+    protected function generateFormFields($dataIniciales)
     {
         return '<label for="emailInput">Email:</label><input type="email"  id="emailInput" name="emailInput" placeholder="Your email">
         <label for="passwordInput">Password:</label><input type="password" id="passwordInput" name="passwordInput" placeholder="Your password">
@@ -187,7 +190,7 @@ class LoginForm extends Form {
      * you want to redirect the user, or an array with the errors that occurred during the processing of the form.
      *
      */
-    protected function processForm($data)
+    protected function processForm($data,$files)
     {
 
     if($data['emailInput']=='') {
@@ -212,7 +215,7 @@ class RegisterForm extends Form {
      *
      * @return string HTML associated with the form fields.
      */
-    protected function generaCamposFormulario($dataIniciales)
+    protected function generateFormFields($dataIniciales)
     {
         return '<label for="emailInput">Email:</label>
         <input type="email"  id="emailInput" name="emailInput" placeholder="Your email">
@@ -234,7 +237,7 @@ class RegisterForm extends Form {
          * you want to redirect the user, or an array with the errors that occurred during the processing of the form.
          *
     */
-    protected function processForm($data)
+    protected function processForm($data,$files)
     {
         require 'config.php';
         if($data['passwordInput']==$data['retypePassword']) {
@@ -245,6 +248,82 @@ class RegisterForm extends Form {
         }
 
         return 'owner.php';
+    }
+
+}
+
+
+class AddRestaurantForm extends Form {
+    /**
+     * Generate the necessary HTML to present the fields of the form.
+     *
+     * @param string[] $dataIniciales Initial data for the form fields (normalmente <code>$_POST</code>).
+     *
+     * @return string HTML associated with the form fields.
+     */
+    protected function generateFormFields($dataIniciales)
+    {
+        return '
+        <fieldset>
+        <legend> What is the name of your new restaurant?</legend>
+        <input type="text"  id="restaurantName" name="restaurantName" placeholder="Tummy Yummy"/>
+        </fieldset>
+
+        <fieldset>
+        <legend> Choose a theme </legend>
+        <input type="radio" name="theme" value="classic" checked>Classic</input>
+        <input type="radio" name="theme" value="modern">Modern</input>
+        </fieldset>
+
+        <fieldset>
+        <legend> Write a brief description </legend>
+        <textarea id="desc" name="desc" placeholder="Best food around"></textarea>
+        </fieldset>
+
+        <fieldset class="info_time">
+        <legend> What are the opening hours?</legend>
+        <textarea id="times" name="times" placeholder="Every day from 12 to 22"></textarea>
+        </fieldset>
+  
+        <fieldset class="info_address">
+        <legend> What is the address?</legend>
+        <textarea id="address" name="address" placeholder="Something Street..."></textarea>
+        </fieldset>
+
+        <fieldset class="logo">
+        <legend>Upload Logo | .jpg or .png | 1:1 ratio </legend>
+        <input type="file" name="logoToUpload" id="logoToUpload"></input>
+        </fieldset>
+
+        <fieldset class="menu">
+        <legend>Upload Menu | .pdf </legend>
+        <input type="file" name="menuToUpload" id="menuToUpload">
+        </fieldset>
+
+      <input type="submit" name="newRestaurant" value="Create">';
+    }
+
+    /**
+     * Process the form data.
+     *
+     * @param string[] $data Data sent by the user (normalmente <code>$_POST</code>).
+     *
+     * @return string|string[] Returns the result of the form processing, usually a URL to which
+         * you want to redirect the user, or an array with the errors that occurred during the processing of the form.
+         *
+    */
+    protected function processForm($data,$files)
+    {
+    	$add=User::addRestaurant($data,$files);
+
+        if($add!='ok') {
+            return array($add,"");
+        } 
+
+
+	
+
+        return 'owner.php   ';
     }
 
 }

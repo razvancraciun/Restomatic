@@ -10,8 +10,13 @@ CREATE TABLE `Restomatic`.`users` (
 CREATE TABLE `Restomatic`.`restaurants` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `owner` INT,
-    `name` VARCHAR(30), 
-    `logo` VARCHAR(50),
+    `name` VARCHAR(30) NOT NULL, 
+    `theme` VARCHAR(30) NOT NULL,
+    `description` VARCHAR(512),
+    `times` VARCHAR(128),
+    `address` VARCHAR(128),
+    `logo` VARCHAR(128),
+    `menu` VARCHAR(128)
 
     FOREIGN KEY(owner) REFERENCES users(id) 
 )

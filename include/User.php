@@ -64,15 +64,59 @@ class User {
         }
     }
 
+
     public static function fetchMyRestaurants() {
         require_once(__DIR__."/Application.php");
         $conn=Application::getInstance()->connectDB();
         if($_SESSION['login']) {
-            $query=sprintf("SELECT restaurants.id, restaurants.name FROM restaurants JOIN users ON users.id=restaurants.owner
+            $query=sprintf("SELECT restaurants.id, restaurants.name, restaurants.logo FROM restaurants JOIN users ON users.id=restaurants.owner
             WHERE users.email='%s';", $_SESSION['email']);
             $result=$conn->query($query);
             return $result;
         }
         return false;
+    }
+
+    public static function addRestaurant($data,$files) {
+        require_once(__DIR__."/Application.php");
+        $conn=Application::getInstance()->connectDB();
+
+        if($_SESSION['login']) {
+            $root=$_SERVER['DOCUMENT_ROOT'].'/restomatic/';
+            $targetDir = 'user/'.$_SESSION['email'].'/'.$data['restaurantName'];
+            $targetLogo = $targetDir.'/'.$files['logoToUpload']['name'];
+            $targetMenu= $targetDir.'/'.$files['menuToUpload']['name'];
+            if(!file_exists($root.$targetDir)) {
+                mkdir($root.$targetDir,0777,true);
+            }
+            
+            if($_FILES['logoToUpload']['type']!='image/jpeg' && $_FILES['logoToUpload']['type']!='image/png') {
+                return "Logo must be a JPEG or PNG file";
+            }
+            if($_FILES['menuToUpload']['type']!='application/pdf') {
+                return "Menu must be a PDF file";
+            }
+
+            if(!move_uploaded_file($_FILES["logoToUpload"]["tmp_name"], $root.$targetLogo)) {
+                return "Error uploading logo";
+            }
+
+            if(!move_uploaded_file($_FILES["menuToUpload"]["tmp_name"], $root.$targetMenu)) {
+                return "Error uploading menu";
+            }
+
+            $query=sprintf("INSERT INTO restaurants(owner,name,theme,description,times,address,logo) 
+            VALUES ('%s','%s','%s','%s','%s','%s','%s')",
+                $conn->query("SELECT id FROM users WHERE email='".$_SESSION["email"]."';")->fetch_assoc()['id'],
+                $data['restaurantName'],
+                $data['theme'],  
+                $data['desc'],
+                $data['times'],
+                $data['address'],
+                $targetLogo);
+            $result=$conn->query($query);
+        }
+
+        return 'ok';
     }
 }
