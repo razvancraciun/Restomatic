@@ -1,9 +1,18 @@
+/*
+	 #D79922 mustard
+	 #EFE2BA cream
+	 #F13C20 red
+	 #4056A1 blue
+	 #C5CBE3 light blue
+*/
+
 html {
 	align-items: center;
 	display: flex;
 	flex-direction: column;
 	min-height: 100%;
 	min-width: 100%;
+	color: #4056a1;
 }
 
 body {
@@ -35,7 +44,7 @@ ul {
 }
 
 .content {
-	background-color: brown;
+	background-color: #efe2ba;
 	display: flex;
 	flex-direction: column;
 	height: 100%;
@@ -86,7 +95,8 @@ ul {
 
 .restaurantGrid {
 	align-self: center;
-	background-color: burlywood;
+	border: 3px solid lightgray;
+	background-color: whitesmoke;
 	display: grid;
 	grid-template-columns: repeat(auto-fill, 140px);
 	justify-content: center;
@@ -98,7 +108,8 @@ ul {
 }
 
 .restaurantGrid li {
-	border: 1px solid black;
+	border: 3px solid lightgray;
+	background-color: #c5cbe3;
 	display: flex;
 	flex-wrap: wrap;
 	flex-direction: column;

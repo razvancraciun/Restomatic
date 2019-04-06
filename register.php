@@ -1,3 +1,8 @@
+<?php
+
+require_once __DIR__.'/include/config.php';
+
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,9 +16,9 @@
 <?php require("include/common/header.php"); ?>
 
 <div class="content">
-    <?php require "include/Form.php";
-    $form=new RegisterForm("registerForm");
-    $form->gestion();
+    <?php
+    $form=new Restomatic\RegisterForm();
+    echo $form->gestiona();
     ?>
 </div>
 </body>

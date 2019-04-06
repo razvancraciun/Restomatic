@@ -13,9 +13,9 @@
 <?php require("include/common/header.php");?>
 
 <div class="content">
-  <?php require 'include/Form.php';
-    $form = new AddRestaurantForm("addRestaurantForm");
-    $form->gestion();
+  <?php
+    $form = new Restomatic\AddRestaurantForm();
+    echo $form->gestiona();
   ?>
 </div>
 </body>

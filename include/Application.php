@@ -1,113 +1,163 @@
 <?php 
 
-class Application {
-    private static $instance;
-
-    public static function getInstance() {
-        if(!self::$instance instanceof self) {
-            self::$instance = new self;
-        }
-        return self::$instance;
-    }
-
-    /**
-	 * @var array Contains the information neeeded to connect to the database ( host, user,password,database)
-	 */
-    private $dbConnectionData;
+namespace Restomatic;
 
 
-    /**
-	 * Stores if the Application is initialized or not
-	 * 
-	 * @var boolean
-	 */
-	private $initialized = false;
+class Application
+{
 
-    /**
-	 * Initializes the application
-	 * 
-	 * @param array $dbConnection data needed to connect to the database
-	 */
-	public function init($dbConnectionData)
-	{
-        if ( ! $this->initialized ) {
-    	    $this->dbConnectionData = $dbConnectionData;
-    		session_start();
-    		$this->initialized = true;
-        }
-    }
+  private static $instancia;
+
+  private $bdDatosConexion;
+
+  private $rutaRaizApp;
+
+  private $dirInstalacion;
+  
+  private $conn;
+
+  public static function getSingleton()
+  {
+      if (  !self::$instancia instanceof self) {
+         self::$instancia = new self;
+      }
+      return self::$instancia;
+  }
+
+  private function __construct()
+  {
+  }
+  /**
+   * Evita que se pueda utilizar el operador clone.
+   */
+  public function __clone()
+  {
+    throw new \Exception('No tiene sentido el clonado');
+  }
+
     
+  /**
+   * Evita que se pueda utilizar serialize().
+   */
+  public function __sleep()
+  {
+    throw new \Exception('No tiene sentido el serializar el objeto');
+  }
+  
+  /**
+   * Evita que se pueda utilizar unserialize().
+   */
+  public function __wakeup()
+  {
+    throw new \Exception('No tiene sentido el deserializar el objeto');
+  }
 
-    /**
-	 * @var \mysql Database connection.
-	 */
-	private $conn;
-	
+  public function init($bdDatosConexion, $rutaRaizApp, $dirInstalacion)
+  {
+    $this->bdDatosConexion = $bdDatosConexion;
 
-    /**
-	 *  Stops the application
-	 */
-	public function shutdown()
-	{
-	    $this->checkInitializedInstance();
-	    if ($this->conn !== null) {
-	        $this->conn->close();
-	    }
-    }
-    
-    /**
-	 * Verifies if the Application is initialized. If not shows a message and terminates execution
-	 */
-	private function checkInitializedInstance()
-	{
-	    if (! $this->initialized ) {
-	        echo "Application is not initialized";
-	        exit();
-	    }
-    }
-    
-    /**
-	 * Creates a database connection. Verifies if there already is one.
-	 * 
-	 * @return \mysqli MySQL connection
-	 */
-	public function connectDB()
-	{
-	    $this->checkInitializedInstance();
-		if (! $this->conn ) {
-			$dbHost = $this->dbConnectionData['host'];
-			$dbUser = $this->dbConnectionData['user'];
-			$dbPass = $this->dbConnectionData['pass'];
-			$db = $this->dbConnectionData['bd'];
-			
-			$this->conn = new \mysqli($dbHost, $dbUser, $dbPass, $db);
-			if ( $this->conn->connect_errno ) {
-				echo "Database connection errror: (" . $this->conn->connect_errno . ") " . utf8_encode($this->conn->connect_error);
-				exit();
-			}
-			if ( ! $this->conn->set_charset("utf8mb4")) {
-				echo "Database codification error: (" . $this->conn->errno . ") " . utf8_encode($this->conn->error);
-				exit();
-			}
-		}
-		return $this->conn;
-	}
-
-
-
-    private function __contstruct() {
-        //we do not want to be able to instanciate this
+    $this->rutaRaizApp = $rutaRaizApp;
+    $tamRutaRaizApp = mb_strlen($this->rutaRaizApp);
+    if ($tamRutaRaizApp > 0 && $this->rutaRaizApp[$tamRutaRaizApp-1] !== '/') {
+      $this->rutaRaizApp .= '/';
     }
 
-    private function __clone() {
-        parent::__clone();
+    $this->dirInstalacion = $dirInstalacion;
+    $tamDirInstalacion = mb_strlen($this->dirInstalacion);
+    if ($tamDirInstalacion > 0 && $this->dirInstalacion[$tamDirInstalacion-1] !== '/') {
+      $this->dirInstalacion .= '/';
     }
 
-    private function __wakeup()
-	{
-        //we do not want to use unserialize
-	    return parent::__wakeup();
-	}
+    $this->conn = null;
+    session_start();
+  }
+
+  public function resuelve($path = '')
+  {
+    $rutaRaizAppLongitudPrefijo = mb_strlen($this->rutaRaizApp);
+    if( mb_substr($path, 0, $rutaRaizAppLongitudPrefijo) === $this->rutaRaizApp ) {
+      return $path;
+    }
+
+    if (mb_strlen($path) > 0 && $path[0] == '/') {
+      $path = mb_substr($path, 1);
+    }
+    return $this->rutaRaizApp . $path;
+  }
+
+  public function doInclude($path = '')
+  {
+    if (mb_strlen($path) > 0 && $path[0] == '/') {
+      $path = mb_substr($path, 1);
+    }
+    include($this->dirInstalacion . '/'.$path);
+  }
+
+  public function login(User $user)
+  {
+    $_SESSION['login'] = true;
+    $_SESSION['email'] = $user->username();
+    $_SESSION['roles'] = $user->roles();
+  }
+
+  public function logout()
+  {
+    //Doble seguridad: unset + destroy
+    unset($_SESSION['login']);
+    unset($_SESSION['nombre']);
+    unset($_SESSION['roles']);
 
 
+    session_destroy();
+    session_start();
+  }
+
+  public function usuarioLogueado()
+  {
+    return ($_SESSION['login'] ?? false) === true;
+  }
+
+  public function nombreUsuario()
+  {
+    return $_SESSION['nombre'] ?? '';
+  }
+
+  public function conexionBd()
+  {
+    if (! $this->conn ) {
+      $bdHost = $this->bdDatosConexion['host'];
+      $bdUser = $this->bdDatosConexion['user'];
+      $bdPass = $this->bdDatosConexion['pass'];
+      $bd = $this->bdDatosConexion['bd'];
+
+      $this->conn = new \mysqli($bdHost, $bdUser, $bdPass, $bd);
+      if ( $this->conn->connect_errno ) {
+        echo "Error de conexión a la BD: (" . $this->conn->connect_errno . ") " . utf8_encode($this->conn->connect_error);
+        exit();
+      }
+      if ( ! $this->conn->set_charset("utf8mb4")) {
+        echo "Error al configurar la codificación de la BD: (" . $this->conn->errno . ") " . utf8_encode($this->conn->error);
+        exit();
+      }
+    }
+    return $this->conn;
+  }
+
+  public function tieneRol($rol, $cabeceraError=NULL, $mensajeError=NULL)
+  {
+    $roles = $_SESSION['roles'] ?? array();
+    if (! in_array($rol, $roles)) {
+      if ( !is_null($cabeceraError) && ! is_null($mensajeError) ) {
+        $bloqueContenido=<<<EOF
+	<h1>$cabeceraError!</h1>
+	<p>$mensajeError.</p>
+EOF;
+        echo $bloqueContenido;
+      }
+
+      return false;
+    }
+
+    return true;
+  }
 }

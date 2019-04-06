@@ -12,7 +12,8 @@
 <?php require("include/common/template_header.php"); ?>
 
 <div class='content'>
-    <h1> Welcome to our restaurant </h1>
+    <h1> Welcome to our Sakura's sushi </h1>
+    <?= "you are now querying" . $_SERVER['REQUEST_URI'] ?>
 
     <p> Here we show the opening hours of the restaurant. Maybe add a description(todo add in form). Maybe address with google maps feature.
 </div>

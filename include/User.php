@@ -1,122 +1,177 @@
 <?php
 
+namespace Restomatic;
+
+use Restomatic\Application as App;
+
 class User {
-    private function __construct($email,$name,$password,$role) {
-        $this->email=$email;
-        $this->name=$name;
-        $this->password=$password;
-        $this->role=$role;
-    }
+	public static function login($username, $password) {
+		$user = self::buscaUsuario($username);
+		if ($user && $user->compruebaPassword($password)) {
+			$app = App::getSingleton();
+			$conn = $app->conexionBd();
+			$query = sprintf("SELECT R.nombre FROM RolesUsuario RU, Roles R WHERE RU.rol = R.id AND RU.usuario=%s", $conn->real_escape_string($user->id));
+			$rs = $conn->query($query);
+			if ($rs) {
+				while($fila = $rs->fetch_assoc()) { 
+					$user->addRol($fila['nombre']);
+				}
+				$rs->free();
+			}
+			return $user;
+			}    
+		return false;
+	}
 
-    public static function searchUser($email) {
-        require_once __DIR__.'/Application.php';
-        $conn =Application::getInstance()->connectDB();
+	public static function buscaUsuario($username) {
+		$app = App::getSingleton();
+		$conn = $app->conexionBd();
+		$query = sprintf("SELECT * FROM users WHERE email='%s'", $conn->real_escape_string($username));
+		$rs = $conn->query($query);
+		if ($rs && $rs->num_rows == 1) {
+			$fila = $rs->fetch_assoc();
+			$user = new User($fila['id'], $fila['email'], $fila['password']);
+			$rs->free();
 
-	    $query=sprintf("SELECT * FROM users U WHERE U.email = '%s'", $conn->real_escape_string($email));
-        $rs = $conn->query($query);
-        if($rs->num_rows==0) {
-            return null;
-        }
-        else {
-            $fila=$rs->fetch_assoc();
-            return new User($fila['email'],$fila['name'],$fila['password'],$fila['role']);
-        }
-    }
+			return $user;
+		}
+		return false;
+	}
 
-    public function checkPassword($password) {
-        return password_verify($password,$this->password);
-    }
+	private $id;
 
-    public static function login($email,$password) {
-        $user=User::searchUser($email);
-        if($user!=null &&  $user->checkPassword($password)) {
-            $_SESSION['login'] = true;
-            $_SESSION['email'] = $email;
-            $_SESSION['isAdmin'] = strcmp($user->role, 'admin') == 0 ? true : false;
-            $_SESSION['name'] = $user->name;
-            header('Location: owner.php');
-           return $user;
-        }
-        else return false;
+	private $username;
 
-    }
+	private $password;
 
-    public static function create($email,$name,$password,$role) {
-        require_once(__DIR__."/Application.php");
-        $conn=Application::getInstance()->connectDB();
-        $query=sprintf("INSERT INTO users(email, name, password, role) VALUES('%s', '%s', '%s', '%s')"
-					, $conn->real_escape_string($email)
-					, $conn->real_escape_string($name)
-					, password_hash($password, PASSWORD_DEFAULT)
-                    , 'user');
-        if ( $conn->query($query) ) {
+	private $roles;
 
-            $_SESSION['login'] = true;
-            $_SESSION['email'] = $email;
-            $_SESSION['name'] = $name;
+	private function __construct($id, $username, $password)
+	{
+		$this->id = $id;
+		$this->username = $username;
+		$this->password = $password;
+		$this->roles = [];
+	}
 
-            header('Location: owner.php');
+	public function id()
+	{
+		return $this->id;
+	}
 
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
+	public function addRol($role)
+	{
+		$this->roles[] = $role;
+	}
+
+	public function roles()
+	{
+		return $this->roles;
+	}
+
+	public function username()
+	{
+		return $this->username;
+	}
+
+	public function compruebaPassword($password)
+	{
+		return password_verify($password, $this->password);
+	}
+
+	public function cambiaPassword($nuevoPassword)
+	{
+		$this->password = password_hash($nuevoPassword, PASSWORD_DEFAULT);
+	}
 
 
-    public static function fetchMyRestaurants() {
-        require_once(__DIR__."/Application.php");
-        $conn=Application::getInstance()->connectDB();
-        if(isset($_SESSION['login']) && $_SESSION['login']) {
-            $query=sprintf("SELECT restaurants.id, restaurants.name, restaurants.logo FROM restaurants JOIN users ON users.id=restaurants.owner
-            WHERE users.email='%s';", $_SESSION['email']);
-            $result=$conn->query($query);
-            return $result;
-        }
-        return header("Location: notLoggedIn.php");
-    }
+	public static function create($email,$name,$password,$role) {
+		$conn=Application::getSingleton()->conexionBD();
+		$query=sprintf("INSERT INTO users(email, name, password, role) VALUES('%s', '%s', '%s', '%s')"
+		, $conn->real_escape_string($email)
+		, $conn->real_escape_string($name)
+		, password_hash($password, PASSWORD_DEFAULT)
+			, 'user');
+		if ( $conn->query($query) ) {
 
-    public static function addRestaurant($data,$files) {
-        require_once(__DIR__."/Application.php");
-        $conn=Application::getInstance()->connectDB();
+			$_SESSION['login'] = true;
+			$_SESSION['email'] = $email;
+			$_SESSION['name'] = $name;
 
-        if($_SESSION['login']) {
-            $root=$_SERVER['DOCUMENT_ROOT'].'/restomatic/';
-            $targetDir = 'user/'.$_SESSION['email'].'/'.$data['restaurantName'];
-            $targetLogo = $targetDir.'/'.$files['logoToUpload']['name'];
-            $targetMenu= $targetDir.'/'.$files['menuToUpload']['name'];
-            if(!file_exists($root.$targetDir)) {
-                mkdir($root.$targetDir,0777,true);
-            }
-            
-            if($_FILES['logoToUpload']['type']!='image/jpeg' && $_FILES['logoToUpload']['type']!='image/png') {
-                return "Logo must be a JPEG or PNG file";
-            }
-            if($_FILES['menuToUpload']['type']!='application/pdf') {
-                return "Menu must be a PDF file";
-            }
+			header('Location: owner.php');
 
-            if(!move_uploaded_file($_FILES["logoToUpload"]["tmp_name"], $root.$targetLogo)) {
-                return "Error uploading logo";
-            }
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 
-            if(!move_uploaded_file($_FILES["menuToUpload"]["tmp_name"], $root.$targetMenu)) {
-                return "Error uploading menu";
-            }
 
-            $query=sprintf("INSERT INTO restaurants(owner,name,theme,description,times,address,logo) 
-            VALUES ('%s','%s','%s','%s','%s','%s','%s')",
-                $conn->query("SELECT id FROM users WHERE email='".$_SESSION["email"]."';")->fetch_assoc()['id'],
-                $data['restaurantName'],
-                $data['theme'],  
-                $data['desc'],
-                $data['times'],
-                $data['address'],
-                $targetLogo);
-            $result=$conn->query($query);
-        }
+	public static function fetchMyRestaurants() {
+		$conn=App::getSingleton()->conexionBD();
+		if(isset($_SESSION['login']) && $_SESSION['login']) {
+			$query=sprintf("SELECT restaurants.id, restaurants.name, restaurants.logo FROM restaurants JOIN users ON users.id=restaurants.owner
+			WHERE users.email='%s';", $_SESSION['email']);
+			$result=$conn->query($query);
+			return $result;
+		}
+		return header("Location: notLoggedIn.php");
+	}
 
-        return 'ok';
-    }
+	public static function addRestaurant($data) {
+		require_once(__DIR__."/Application.php");
+		$conn=Application::getSingleton()->conexionBD();
+
+		if($_SESSION['login']) {
+			$root=$_SERVER['DOCUMENT_ROOT'].'/restomatic/';
+			$targetDir = 'user/'.$_SESSION['email'].'/'.$data['restaurantName'];
+
+
+			if(!file_exists($root.$targetDir)) {
+				mkdir($root.$targetDir,0777,true);
+			}
+
+			if(isset($_FILES['logoToUpload']['tmp_name'])&& $_FILES['logoToUpload']['tmp_name']!='') {
+				$targetLogo = $targetDir.'/'.$_FILES['logoToUpload']['name'];
+				$finfo = finfo_open(FILEINFO_MIME_TYPE);
+				$mime = finfo_file($finfo, $_FILES['logoToUpload']['tmp_name']);
+				if ($mime == 'image/jpeg'|| $mime=='image/png') {
+					if(!move_uploaded_file($_FILES["logoToUpload"]["tmp_name"], $root.$targetLogo)) {
+						return "Error uploading logo";
+					}
+				}
+				else return "Invalid file type for logo";
+				finfo_close($finfo);
+			}
+			else return "Please upload the logo";
+
+			if(isset($_FILES['menuToUpload']['tmp_name'])&& $_FILES['menuToUpload']['tmp_name']!='') {
+				$targetMenu= $targetDir.'/'.$_FILES['menuToUpload']['name'];
+				$finfo = finfo_open(FILEINFO_MIME_TYPE);
+				$mime = finfo_file($finfo, $_FILES['menuToUpload']['tmp_name']);
+				if ($mime == 'application/pdf') {
+					if(!move_uploaded_file($_FILES["menuToUpload"]["tmp_name"], $root.$targetMenu)) {
+						return "Error uploading logo";
+					}
+				}
+				else return "Invalid file type for menu";
+				finfo_close($finfo);
+			}
+			else return "Please upload the menu";
+
+			$query=sprintf("INSERT INTO restaurants(owner,name,theme,description,times,address,logo) 
+			VALUES ('%s','%s','%s','%s','%s','%s','%s')",
+			$conn->query("SELECT id FROM users WHERE email='".$_SESSION["email"]."';")->fetch_assoc()['id'],
+				$data['restaurantName'],
+				$data['theme'],  
+				$data['desc'],
+				$data['times'],
+				$data['address'],
+				$targetLogo);
+			$result=$conn->query($query);
+		}
+
+		return 'ok';
+	}
 }

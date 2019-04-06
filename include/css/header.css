@@ -1,7 +1,15 @@
+/*
+	 #D79922 mustard
+	 #EFE2BA cream
+	 #F13C20 red
+	 #4056A1 blue
+	 #C5CBE3 light blue
+*/
+
 header {
 	width: 100%;
 	display: flex;
-	background-color: rgb(255, 0, 0);
+	background-color: #f13c20;
 	justify-content: space-between;
 }
 
@@ -10,7 +18,7 @@ header a:hover {
 }
 
 header a {
-	color: white;
+	color: #efe2ba;
 	font-weight: bolder;
 	text-decoration-line: none;
 }

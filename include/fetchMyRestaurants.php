@@ -1,5 +1,7 @@
 <?php
 
+namespace Restomatic;
+
  $restaurants=User::fetchMyRestaurants();
  
  $html="";

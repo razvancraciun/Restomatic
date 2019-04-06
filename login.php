@@ -11,10 +11,8 @@
 <body>
 <?php require("include/common/header.php"); ?>
 <div class="content">
-    <?php require 'include/Form.php';
-        $form = new LoginForm('loginForm',array());
-        $form->gestion();
-    ?>
+    <?php $loginForm  = new Restomatic\LoginForm();
+        echo $loginForm->gestiona(); ?>
 </div>
 </body>
 

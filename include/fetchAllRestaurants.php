@@ -1,6 +1,9 @@
 <?php
 
-$conn=Application::getInstance()->connectDB();
+namespace Restomatic;
+
+
+$conn=Application::getSingleton()->conexionBD();
 $query=sprintf("SELECT * from restaurants");
 $result=$conn->query($query);
 while($res=$result->fetch_assoc()) {
