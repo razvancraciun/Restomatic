@@ -10,10 +10,14 @@
 - Classic style for rest template
 - Modern style for rest template
 - Update restaurant logo,menus,times etc..
-- Show templates on specific URL's  ( like MJ's Veggies at restomatic/mjveggies ) 
+- Show templates on specific URL's  ( like MJ's Veggies at restomatic/mjveggies )
 - Colors to use for text/backgrounds/links
 - Footer
 - Fonts (Avenir)
+- Rating option for logged in users, extra text box on restaurant pages
+- Registration Capture with Restaurant theme, name pics and randomize
+- change menu url to show db id instead of e-mail
+- show average rating next to restaurant logos on index.php
 
 - Anything more??
 
