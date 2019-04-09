@@ -24,10 +24,10 @@ class LoginForm extends Form
 
     $camposFormulario=<<<EOF
 		<fieldset>
-		  <legend>Username and Password</legend>
-		  <p><label>Name:</label> <input type="text" name="username" value="$username"/></p>
-		  <p><label>Password:</label> <input type="password" name="password" value="$password"/><br /></p>
-		  <button type="submit">Entrar</button>
+		  <legend>Email and Password</legend>
+		  <label>Email:</label><br><input type="text" name="username" value="$username" placeholder="Your email"/>
+		  <label>Password:</label><br> <input type="password" name="password" value="$password" placeholder="Your password"/>
+		  <button type="submit">Login</button>
 		</fieldset>
 EOF;
     return $camposFormulario;

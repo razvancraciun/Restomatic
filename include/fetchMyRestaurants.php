@@ -14,7 +14,7 @@ namespace Restomatic;
     }
     else $html.= "<img src='".$res['logo']."'>";
        
-    $html.="<a href='#'>".$res['name']."</a>"
+    $html.="<a href='".$res['domain']."'>".$res['name']."</a>"
         ."</div>"
         ."<div>"
         ."<a href='#' class='updateButton'>Update</a>"

@@ -26,7 +26,8 @@ class RegisterForm extends Form {
         <label for="passwordInput">Password:</label>
         <input type="password" id="passwordInput" name="passwordInput" placeholder="Your password">
         <label for="retypePassword">Repeat password:</label>
-        <input type="password" id="retypePassword" name="retypePassword" placeholder="Your password">
+        <input type="password" id="retypePassword" name="retypePassword" placeholder="Your password"> 
+        <p><input type="checkbox" name="userType" >I\'m a restaurant owner</input></p>
         <input type="submit" value="Register">
         </fieldset>';
     }
@@ -42,15 +43,27 @@ class RegisterForm extends Form {
     */
     protected function procesaFormulario($data)
     {
+        $role = '';
+        if($data['userType']) {
+            $role='owner';
+        }
+        else $role='user';
+
         if($data['passwordInput']==$data['retypePassword']) {
-            $user= User::create($_REQUEST['emailInput'],$_REQUEST['nameInput'],$_REQUEST['passwordInput'],'owner');
+            $user= User::create($_REQUEST['emailInput'],$_REQUEST['nameInput'],$_REQUEST['passwordInput'],$role);
         }
         else return array('Passwords do not match', '');
         if(!$user) {
             return array('User already exists', '');
         }
 
-        return 'owner.php';
+        if($role=='owner') {
+            return 'owner.php';
+        }
+        else {
+            return 'index.php';
+        }
+        
     }
 
 }

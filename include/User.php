@@ -10,11 +10,11 @@ class User {
 		if ($user && $user->compruebaPassword($password)) {
 			$app = App::getSingleton();
 			$conn = $app->conexionBd();
-			$query = sprintf("SELECT R.nombre FROM RolesUsuario RU, Roles R WHERE RU.rol = R.id AND RU.usuario=%s", $conn->real_escape_string($user->id));
+			$query = sprintf("SELECT role FROM users u WHERE u.id='%s'", $conn->real_escape_string($user->id));
 			$rs = $conn->query($query);
 			if ($rs) {
 				while($fila = $rs->fetch_assoc()) { 
-					$user->addRol($fila['nombre']);
+					$user->addRol($fila['role']);
 				}
 				$rs->free();
 			}
@@ -51,7 +51,7 @@ class User {
 		$this->id = $id;
 		$this->username = $username;
 		$this->password = $password;
-		$this->roles = [];
+		$this->roles = '';
 	}
 
 	public function id()
@@ -61,7 +61,7 @@ class User {
 
 	public function addRol($role)
 	{
-		$this->roles[] = $role;
+		$this->roles = $role;
 	}
 
 	public function roles()
@@ -91,15 +91,13 @@ class User {
 		, $conn->real_escape_string($email)
 		, $conn->real_escape_string($name)
 		, password_hash($password, PASSWORD_DEFAULT)
-			, 'user');
+			, $role);
 		if ( $conn->query($query) ) {
 
 			$_SESSION['login'] = true;
 			$_SESSION['email'] = $email;
 			$_SESSION['name'] = $name;
-
-			header('Location: owner.php');
-
+			$_SESSION['roles'] = $role;
 			return true;
 		}
 		else {
@@ -111,7 +109,7 @@ class User {
 	public static function fetchMyRestaurants() {
 		$conn=App::getSingleton()->conexionBD();
 		if(isset($_SESSION['login']) && $_SESSION['login']) {
-			$query=sprintf("SELECT restaurants.id, restaurants.name, restaurants.logo FROM restaurants JOIN users ON users.id=restaurants.owner
+			$query=sprintf("SELECT restaurants.id, restaurants.name, restaurants.logo, restaurants.domain FROM restaurants JOIN users ON users.id=restaurants.owner
 			WHERE users.email='%s';", $_SESSION['email']);
 			$result=$conn->query($query);
 			return $result;
@@ -120,13 +118,13 @@ class User {
 	}
 
 	public static function addRestaurant($data) {
-		require_once(__DIR__."/Application.php");
 		$conn=Application::getSingleton()->conexionBD();
 
 		if($_SESSION['login']) {
 			$root=$_SERVER['DOCUMENT_ROOT'].'/restomatic/';
 			$targetDir = 'user/'.$_SESSION['email'].'/'.$data['restaurantName'];
-
+			$targetLogo='';
+			$targetMenu='';
 
 			if(!file_exists($root.$targetDir)) {
 				mkdir($root.$targetDir,0777,true);
@@ -160,18 +158,86 @@ class User {
 			}
 			else return "Please upload the menu";
 
-			$query=sprintf("INSERT INTO restaurants(owner,name,theme,description,times,address,logo) 
-			VALUES ('%s','%s','%s','%s','%s','%s','%s')",
-			$conn->query("SELECT id FROM users WHERE email='".$_SESSION["email"]."';")->fetch_assoc()['id'],
+			$query=sprintf("INSERT INTO restaurants(owner,name,theme,description,times,address,logo,menu,domain) 
+			VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s')",
+			$conn->query("SELECT id FROM users WHERE email='".$_SESSION['email']."';")->fetch_assoc()['id'],
 				$data['restaurantName'],
 				$data['theme'],  
 				$data['desc'],
 				$data['times'],
 				$data['address'],
-				$targetLogo);
+				$targetLogo,
+				$targetMenu,
+				APP_ROUTE.'restaurants/'.preg_replace("/[^A-Za-z0-9]/", "", $data['restaurantName']));
 			$result=$conn->query($query);
 		}
 
 		return 'ok';
+	}
+
+	public static function getRestaurantPage($uri) {
+		$conn=Application::getSingleton()->conexionBD();
+		$query=sprintf("SELECT * FROM restaurants WHERE domain='%s'",$uri);
+		
+		if( ($result=$conn->query($query)) ) {
+			if( ($data=$result->fetch_assoc()) ) {
+				return User::buildRestaurantPage($data);
+			}
+			else return '<h1> Page could not be found </h1>';
+		}
+
+
+		return '<h1> Page could not be found </h1>';
+	}
+
+	private static function buildRestaurantPage($data) {
+		$html =  '<h1>'.$data['name'].'</h1>';
+		$html .= '<p>'.$data['description'].'</p>';
+		$html .= '<h3> Open hours: </h3>';
+		$html .= '<p>'.$data['times'].'</p>';
+		$html .= '<h3> Find us at: </h3>';
+		$html .= '<p>'.$data['address'].'</p>';
+		$html .= '<h3> Check out our menu: </h3>';
+		$html .= '<a href="'.APP_ROUTE.$data['menu'].'">Menu</a>';
+		$html .= USER::getReviewList($data['id']);
+		if(isset($_SESSION['login']) && $_SESSION['login'] && ($_SESSION['roles']=='user' || $_SESSION['roles']=='admin')) { //MAKE SEPARATE FORM CLASS INSTEAD
+			$html .= '<form><fieldset>';
+			$html .= '<h3>Have you been here?</h3>';
+			$html .= '<textarea rows="5" cols="50" placeholder="Write your review..."></textarea>';
+			$html .= '<button type="submit">Post</button>';
+			$html .= '</fieldset></form>';
+		}
+		return $html;
+	}
+
+	private static function  getReviewList($id) {
+		$conn=Application::getSingleton()->conexionBD();
+		$query= sprintf("SELECT * FROM reviews JOIN users ON reviews.reviewer_id=users.id WHERE reviews.restaurant_id='%s'",
+			$id);
+		$html='<h3> Reviews: </h3>';
+		if( ($result=$conn->query($query)) ) {
+			if($result->num_rows<1) {
+				$html .='<p> There are no reviews </p>';
+			}
+			else {
+				$html .= '<ul class="reviewList">';
+			}
+			while( ($data=$result->fetch_assoc()) ) {
+				$html.= '<li>';
+				$html .= '<div>';
+				$html.= '<p><b>'.$data['name'].'</b> says: </p>';
+				$html.= '<p>'.$data['text'].'</p>';
+				$html .='</div>';
+				$html .= '<div>';
+				$html .= '<a href="">Report</a>';
+				$html .= '</div>';
+				$html.='</li>';
+			}
+
+		
+			$html.= '</ul>';
+		}
+		
+		return $html;
 	}
 }

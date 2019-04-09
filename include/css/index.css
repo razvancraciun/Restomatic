@@ -10,7 +10,7 @@ html {
 	align-items: center;
 	display: flex;
 	flex-direction: column;
-	min-height: 100%;
+	min-height: 100vh;
 	min-width: 100%;
 	color: #4056a1;
 }
@@ -19,7 +19,7 @@ body {
 	align-items: center;
 	display: flex;
 	flex-direction: column;
-	min-height: 100vh;
+	min-height: 100%;
 	min-width: 95%;
 }
 fieldset {
@@ -125,4 +125,41 @@ ul {
 
 .restaurantGrid li a {
 	color: gray;
+}
+
+.reviewList {
+	align-self: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	width: 60%;
+
+	margin-top: 2% auto;
+}
+
+.reviewList li {
+	border: 2px solid lightgray;
+	background-color: burlywood;
+	display: flex;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	padding: 5px;
+	margin: 3px;
+}
+
+.reviewList li a {
+	align-self: flex-end;
+}
+
+.reviewList div {
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+}
+
+.reviewList div p {
+	align-self: flex-start;
 }

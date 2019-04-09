@@ -2,10 +2,11 @@
 RewriteEngine on
 
 # Rewrite for index.php
-RewriteRule ^/ index.php [NC,L]
-RewriteRule ^login login.php [NC,L]
-RewriteRule ^register register.php [NC,L]
-RewriteRule ^owner owner.php [NC,L]
+RewriteRule ^/ index.php
+RewriteRule ^login login.php
+RewriteRule ^register register.php
+RewriteRule ^owner owner.php
+RewriteRule ^restaurants/(.*) template.php
 
 ErrorDocument 403 /restomatic/err/403.php
 ErrorDocument 404 /restomatic/err/404.php
