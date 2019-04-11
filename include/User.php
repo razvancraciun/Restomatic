@@ -201,11 +201,8 @@ class User {
 		$html .= '<a href="'.APP_ROUTE.$data['menu'].'">Menu</a>';
 		$html .= USER::getReviewList($data['id']);
 		if(isset($_SESSION['login']) && $_SESSION['login'] && ($_SESSION['roles']=='user' || $_SESSION['roles']=='admin')) { //MAKE SEPARATE FORM CLASS INSTEAD
-			$html .= '<form><fieldset>';
-			$html .= '<h3>Have you been here?</h3>';
-			$html .= '<textarea rows="5" cols="50" placeholder="Write your review..."></textarea>';
-			$html .= '<button type="submit">Post</button>';
-			$html .= '</fieldset></form>';
+			$form = new AddReviewForm();
+			$html.=$form->gestiona();
 		}
 		return $html;
 	}
@@ -239,5 +236,25 @@ class User {
 		}
 		
 		return $html;
+	}
+
+	public static function addReview($userEmail,$restaurantDomain,$reviewText) {
+
+		$conn=Application::getSingleton()->conexionBD();
+		$query=sprintf("SELECT id FROM restaurants WHERE domain='%s'",$restaurantDomain);
+		$result=$conn->query($query);
+		if(!$result) return false;
+		$restaurantId= $result->fetch_assoc()['id'];
+		$query=sprintf("SELECT id FROM users WHERE email='%s'",$userEmail);
+		$result=$conn->query($query);
+		if(!$result) return false;
+		$userId= $result->fetch_assoc()['id'];
+		$query = sprintf("INSERT INTO reviews(restaurant_id,reviewer_id,text) VALUES('%s','%s','%s')",
+				$restaurantId,$userId,$reviewText);
+
+		if($conn->query($query)) {
+			return true;
+		}
+		return false;
 	}
 }
