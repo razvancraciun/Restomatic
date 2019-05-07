@@ -164,7 +164,6 @@ class Form
     $html .= '</form>';
     return $html;
   }
-
   private function generaListaErrores($errores)
   {
     $html='';

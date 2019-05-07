@@ -6,11 +6,11 @@
 
 ## To do:
 
-- Restaurant template -fetch description,logo,contact
+- ~~Restaurant template -fetch description,logo,contact~~
 - Classic style for rest template
 - Modern style for rest template
 - Update restaurant logo,menus,times etc..
-- Show templates on specific URL's  ( like MJ's Veggies at restomatic/mjveggies )
+- ~~Show templates on specific URL's  ( like MJ's Veggies at restomatic/mjveggies )~~
 - Colors to use for text/backgrounds/links
 - Footer
 - Fonts (Avenir)

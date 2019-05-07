@@ -9,12 +9,13 @@ namespace Restomatic;
  while($res=$restaurants->fetch_assoc()) {
      
     $html.="<li>"."<div>";
+    $html.="<a href='".$res['domain']."'>";
     if($res['logo']=='') {
         $html.="<img src='img/default.png'>";
     }
     else $html.= "<img src='".$res['logo']."'>";
        
-    $html.="<a href='".$res['domain']."'>".$res['name']."</a>"
+    $html.=$res['name']."</a>"
         ."</div>"
         ."<div>"
         ."<a href='#' class='updateButton'>Update</a>"
