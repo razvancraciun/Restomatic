@@ -1,0 +1,70 @@
+#deco1{
+  position: absolute;
+  width: 772px;
+  height: 522px;
+  left: 0px;
+  top: 138px;
+
+  background: url(food.jpg);}
+
+#deco2{
+  position: absolute;
+  width: 330px;
+  left: 889px;
+  top: 597px;
+
+  background: url(bloom-blossom-flora-1608525.jpg);
+}
+
+#welcome p {
+  position: absolute;
+  width: 671px;
+  height: 228px;
+  left: 249px;
+  top: 509px;
+
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 72px;
+  line-height: 84px;
+
+  color: #000000;
+
+}
+
+#welcome rect{
+  position: absolute;
+  width: 711px;
+  height: 229px;
+  left: 249px;
+  top: 462px;
+
+  background: #FAA0A0;
+}
+
+#menu{
+  position: absolute;
+  width: 491px;
+  height: 372px;
+  left: 1429px;
+  top: 138px;
+
+  background: url(blank-blur-bright-717129.jpg);
+}
+
+#times{
+  position: absolute;
+  width: 521px;
+  height: 219px;
+  left: 840px;
+  top: 191px;
+
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 48px;
+  line-height: 56px;
+
+  color: #000000;
+}

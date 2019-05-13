@@ -13,13 +13,13 @@ class User {
 			$query = sprintf("SELECT role FROM users u WHERE u.id='%s'", $conn->real_escape_string($user->id));
 			$rs = $conn->query($query);
 			if ($rs) {
-				while($fila = $rs->fetch_assoc()) { 
+				while($fila = $rs->fetch_assoc()) {
 					$user->addRol($fila['role']);
 				}
 				$rs->free();
 			}
 			return $user;
-			}    
+			}
 		return false;
 	}
 
@@ -121,13 +121,8 @@ class User {
 		$conn=Application::getSingleton()->conexionBD();
 
 		if($_SESSION['login']) {
-			$root=$_SERVER['DOCUMENT_ROOT'].APP_ROUTE;
-			$ownerId = $conn->query("SELECT id FROM users WHERE email='".$_SESSION['email']."';")->fetch_assoc()['id'];
-			$id = $conn->query("SELECT max(id) as id from restaurants")->fetch_assoc()['id'];
-			$id++;
-
-
-			$targetDir = 'user/'.$ownerId.'/'.$id;
+			$root=$_SERVER['DOCUMENT_ROOT'].'/restomatic/';
+			$targetDir = 'user/'.$_SESSION['email'].'/'.$data['restaurantName'];
 			$targetLogo='';
 			$targetMenu='';
 
@@ -163,14 +158,11 @@ class User {
 			}
 			else return "Please upload the menu";
 
-
-
-			$query=sprintf("INSERT INTO restaurants(id,owner,name,theme,description,times,address,logo,menu,domain) 
-			VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')",
-				$id,
-				$ownerId,
+			$query=sprintf("INSERT INTO restaurants(owner,name,theme,description,times,address,logo,menu,domain)
+			VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s')",
+			$conn->query("SELECT id FROM users WHERE email='".$_SESSION['email']."';")->fetch_assoc()['id'],
 				$data['restaurantName'],
-				$data['theme'],  
+				$data['theme'],
 				$data['desc'],
 				$data['times'],
 				$data['address'],
@@ -186,7 +178,7 @@ class User {
 	public static function getRestaurantPage($uri) {
 		$conn=Application::getSingleton()->conexionBD();
 		$query=sprintf("SELECT * FROM restaurants WHERE domain='%s'",$uri);
-		
+
 		if( ($result=$conn->query($query)) ) {
 			if( ($data=$result->fetch_assoc()) ) {
 				return User::buildRestaurantPage($data);
@@ -200,14 +192,19 @@ class User {
 
 	private static function buildRestaurantPage($data) {
 		$html =  '<h1>'.$data['name'].'</h1>';
-		$html .= '<p>'.$data['description'].'</p>';
-		$html .= '<h3> Open hours: </h3>';
-		$html .= '<p>'.$data['times'].'</p>';
-		$html .= '<h3> Find us at: </h3>';
-		$html .= '<p>'.$data['address'].'</p>';
-		$html .= '<h3> Check out our menu: </h3>';
+		$html .= '<img id="deco1"/>'
+		$html .= '<p id="description">'.$data['description'].'</p>';
+		$html .= '<div id="welcome">'.'<p id="welcome-text">Welcome to '.$data['name']'</p>'.'<svg id="welcome-svg"> <rect="welcome-rect"/> </svg>'.'</div>';
+		$html .= '<img id="deco2"/>'
+		$html .= '<h3 id="times-head"> open hours </h3>';
+		$html .= '<p id="times">'.$data['times'].'</p>';
+		$html .= '<h3 "id=address-head"> find us at: </h3>';
+		$html .= '<div id="address">'.'<p id="address-text">'.$data['address'].'</p>'.'<svg id="address-svg"> <rect="address-rect"/> </svg>'.'</div>';
+		$html .= '<img id="menu"/>'
+		$html .= '<div id="menu">'.'<p id=menu-text>our menu</p>'.'<svg id="menu-svg"> <rect="menu-rect"/> </svg>'.'</div>';
 		$html .= '<a href="'.APP_ROUTE.$data['menu'].'">Menu</a>';
 		$html .= USER::getReviewList($data['id']);
+
 		if(isset($_SESSION['login']) && $_SESSION['login'] && ($_SESSION['roles']=='user' || $_SESSION['roles']=='admin')) { //MAKE SEPARATE FORM CLASS INSTEAD
 			$form = new AddReviewForm();
 			$html.=$form->gestiona();
@@ -239,10 +236,10 @@ class User {
 				$html.='</li>';
 			}
 
-		
+
 			$html.= '</ul>';
 		}
-		
+
 		return $html;
 	}
 
