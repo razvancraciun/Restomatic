@@ -121,8 +121,13 @@ class User {
 		$conn=Application::getSingleton()->conexionBD();
 
 		if($_SESSION['login']) {
-			$root=$_SERVER['DOCUMENT_ROOT'].'/restomatic/';
-			$targetDir = 'user/'.$_SESSION['email'].'/'.$data['restaurantName'];
+			$root=$_SERVER['DOCUMENT_ROOT'].APP_ROUTE;
+			$ownerId = $conn->query("SELECT id FROM users WHERE email='".$_SESSION['email']."';")->fetch_assoc()['id'];
+			$id = $conn->query("SELECT max(id) as id from restaurants")->fetch_assoc()['id'];
+			$id++;
+
+
+			$targetDir = 'user/'.$ownerId.'/'.$id;
 			$targetLogo='';
 			$targetMenu='';
 
@@ -158,9 +163,12 @@ class User {
 			}
 			else return "Please upload the menu";
 
-			$query=sprintf("INSERT INTO restaurants(owner,name,theme,description,times,address,logo,menu,domain) 
-			VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s')",
-			$conn->query("SELECT id FROM users WHERE email='".$_SESSION['email']."';")->fetch_assoc()['id'],
+
+
+			$query=sprintf("INSERT INTO restaurants(id,owner,name,theme,description,times,address,logo,menu,domain) 
+			VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')",
+				$id,
+				$ownerId,
 				$data['restaurantName'],
 				$data['theme'],  
 				$data['desc'],
