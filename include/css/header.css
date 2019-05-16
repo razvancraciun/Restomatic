@@ -22,7 +22,6 @@ header a {
 	font-weight: bolder;
 	text-decoration-line: none;
 }
-
 .home {
 	float: left;
 	margin: 10px;
@@ -37,20 +36,6 @@ header a {
 	margin-right: 3%;
 }
 
-.headerWelcomeText {
-	display: flex;
-	justify-content: center;
-}
-
-.headerLoginButton {
+.headerLogin a {
 	margin: 10px;
-}
-
-.headerRegisterButton {
-	margin: 10px;
-}
-
-.headerLogoutButton {
-	margin: 10px;
-	align-self: center;
 }

@@ -119,17 +119,23 @@ class User {
 
 	public static function addRestaurant($data) {
 		$conn=Application::getSingleton()->conexionBD();
-
 		if($_SESSION['login']) {
-			$root=$_SERVER['DOCUMENT_ROOT'].'/restomatic/';
-			$targetDir = 'user/'.$_SESSION['email'].'/'.$data['restaurantName'];
+			$root=$_SERVER['DOCUMENT_ROOT'].APP_ROUTE;
+			$ownerId = $conn->query("SELECT id FROM users WHERE email='".$_SESSION['email']."';")->fetch_assoc()['id'];
+			$id = $conn->query("SELECT nvl(max(id),'0') as id from restaurants");
+			if(!$id) {
+				$id=0;
+			}
+			else {
+				$id=$id->fetch_assoc()['id'];
+			}
+			$id++;
+			$targetDir = 'user/'.$ownerId.'/'.$id;
 			$targetLogo='';
 			$targetMenu='';
-
 			if(!file_exists($root.$targetDir)) {
 				mkdir($root.$targetDir,0777,true);
 			}
-
 			if(isset($_FILES['logoToUpload']['tmp_name'])&& $_FILES['logoToUpload']['tmp_name']!='') {
 				$targetLogo = $targetDir.'/'.$_FILES['logoToUpload']['name'];
 				$finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -143,7 +149,6 @@ class User {
 				finfo_close($finfo);
 			}
 			else return "Please upload the logo";
-
 			if(isset($_FILES['menuToUpload']['tmp_name'])&& $_FILES['menuToUpload']['tmp_name']!='') {
 				$targetMenu= $targetDir.'/'.$_FILES['menuToUpload']['name'];
 				$finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -157,12 +162,12 @@ class User {
 				finfo_close($finfo);
 			}
 			else return "Please upload the menu";
-
-			$query=sprintf("INSERT INTO restaurants(owner,name,theme,description,times,address,logo,menu,domain)
-			VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s')",
-			$conn->query("SELECT id FROM users WHERE email='".$_SESSION['email']."';")->fetch_assoc()['id'],
+			$query=sprintf("INSERT INTO restaurants(id,owner,name,theme,description,times,address,logo,menu,domain) 
+			VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')",
+				$id,
+				$ownerId,
 				$data['restaurantName'],
-				$data['theme'],
+				$data['theme'],  
 				$data['desc'],
 				$data['times'],
 				$data['address'],
@@ -171,7 +176,6 @@ class User {
 				APP_ROUTE.'restaurants/'.preg_replace("/[^A-Za-z0-9]/", "", $data['restaurantName']));
 			$result=$conn->query($query);
 		}
-
 		return 'ok';
 	}
 
@@ -192,19 +196,13 @@ class User {
 
 	private static function buildRestaurantPage($data) {
 		$html =  '<h1>'.$data['name'].'</h1>';
-		$html .= '<img id="deco1"/>'
-		$html .= '<p id="description">'.$data['description'].'</p>';
-		$html .= '<div id="welcome">'.'<p id="welcome-text">Welcome to '.$data['name']'</p>'.'<svg id="welcome-svg"> <rect="welcome-rect"/> </svg>'.'</div>';
-		$html .= '<img id="deco2"/>'
-		$html .= '<h3 id="times-head"> open hours </h3>';
-		$html .= '<p id="times">'.$data['times'].'</p>';
-		$html .= '<h3 "id=address-head"> find us at: </h3>';
-		$html .= '<div id="address">'.'<p id="address-text">'.$data['address'].'</p>'.'<svg id="address-svg"> <rect="address-rect"/> </svg>'.'</div>';
-		$html .= '<img id="menu"/>'
-		$html .= '<div id="menu">'.'<p id=menu-text>our menu</p>'.'<svg id="menu-svg"> <rect="menu-rect"/> </svg>'.'</div>';
-		$html .= '<a href="'.APP_ROUTE.$data['menu'].'">Menu</a>';
-		$html .= USER::getReviewList($data['id']);
-
+		$html .= '<p>'.$data['description'].'</p>';
+		$html .= '<h3> Open hours: </h3>';
+		$html .= '<p>'.$data['times'].'</p>';
+		$html .= '<h3> Find us at: </h3>';
+		$html .= '<p>'.$data['address'].'</p>';
+		$html .= '<h3> Check out our menu <a href="'.APP_ROUTE.$data['menu'].'">here</a>'.'.</h3>';
+		$html .= USER::getReviewList($data['id'],$data['domain']);
 		if(isset($_SESSION['login']) && $_SESSION['login'] && ($_SESSION['roles']=='user' || $_SESSION['roles']=='admin')) { //MAKE SEPARATE FORM CLASS INSTEAD
 			$form = new AddReviewForm();
 			$html.=$form->gestiona();
@@ -212,9 +210,9 @@ class User {
 		return $html;
 	}
 
-	private static function  getReviewList($id) {
+	private static function  getReviewList($id,$domain) {
 		$conn=Application::getSingleton()->conexionBD();
-		$query= sprintf("SELECT * FROM reviews JOIN users ON reviews.reviewer_id=users.id WHERE reviews.restaurant_id='%s'",
+		$query= sprintf("SELECT reviews.id as 'id', users.name as 'name', reviews.text as 'text'  FROM reviews JOIN users ON reviews.reviewer_id=users.id WHERE reviews.restaurant_id='%s'",
 			$id);
 		$html='<h3> Reviews: </h3>';
 		if( ($result=$conn->query($query)) ) {
@@ -231,7 +229,7 @@ class User {
 				$html.= '<p>'.$data['text'].'</p>';
 				$html .='</div>';
 				$html .= '<div>';
-				$html .= '<a href="">Report</a>';
+				$html .= '<a href="'.APP_ROUTE.'include/processReviewReport.php?id='.$data['id'].'&domain='.$domain.'">Report</a>';
 				$html .= '</div>';
 				$html.='</li>';
 			}
@@ -254,12 +252,52 @@ class User {
 		$result=$conn->query($query);
 		if(!$result) return false;
 		$userId= $result->fetch_assoc()['id'];
-		$query = sprintf("INSERT INTO reviews(restaurant_id,reviewer_id,text) VALUES('%s','%s','%s')",
-				$restaurantId,$userId,$reviewText);
+		$query = sprintf("INSERT INTO reviews(restaurant_id,reviewer_id,text,reports) VALUES('%s','%s','%s','%s')",
+				$restaurantId,$userId,$reviewText,'0');
 
 		if($conn->query($query)) {
 			return true;
 		}
 		return false;
 	}
+
+	public static function reportedReviewsList() {
+		if(!isset($_SESSION['login'])||!$_SESSION['login']||$_SESSION['roles']!='admin') {
+			header("Location: ".APP_ROUTE );
+		}
+		$conn=Application::getSingleton()->conexionBD();
+		$query= sprintf("SELECT reviews.id as 'id', users.name as 'name', reviews.text as 'text'  FROM reviews JOIN users ON reviews.reviewer_id=users.id WHERE reviews.reports>0");
+		$html='<h1> Reported reviews: </h1>';
+		if( ($result=$conn->query($query)) ) {
+			if($result->num_rows<1) {
+				$html .='<p> There are no reviews </p>';
+			}
+			else {
+				$html .= '<ul class="reviewList">';
+			}
+			while( ($data=$result->fetch_assoc()) ) {
+				$html.= '<li>';
+				$html .= '<div>';
+				$html.= '<p><b>'.$data['name'].'</b> says: </p>';
+				$html.= '<p>'.$data['text'].'</p>';
+				$html .='</div>';
+				$html .= '<div>';
+				$html .= '<a href="'.APP_ROUTE.'include/deleteReview.php?id='.$data['id'].'">Delete</a>';
+				$html .= '</div>';
+				$html.='</li>';
+			}
+		}
+		return $html;
+	}
+
+
+	public static function deleteReview($id) {
+		if(!isset($_SESSION['login'])||!$_SESSION['login']||$_SESSION['roles']!='admin') {
+			header("Location: ".APP_ROUTE );
+		}
+		$conn=Application::getSingleton()->conexionBD();
+
+		header("Location:".APP_ROUTE);
+	}
 }
+

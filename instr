@@ -8,5 +8,6 @@ if direct connection server is container.fdi.ucm.es and port is 20062
 if indirect connection server is localhost and port is 2222, but before you need
 to do 
 	ssh -L 2222:VM-0031:22 -N hop@container.fdi.ucm.es
+password default
 
 https://container.fdi.ucm.es/VM-0031/

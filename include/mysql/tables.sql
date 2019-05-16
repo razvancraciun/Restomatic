@@ -28,6 +28,7 @@ CREATE TABLE `Restomatic`.`reviews` (
     `restaurant_id` INT,
     `reviewer_id` INT,
     `text` VARCHAR(256) NOT NULL,
+    `reports` INT,
 
     FOREIGN KEY(restaurant_id) REFERENCES restaurants(id),
     FOREIGN KEY(reviewer_id) REFERENCES users(id)
