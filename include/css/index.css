@@ -54,6 +54,16 @@ ul {
 	height: 100%;
 }
 
+.content a {
+	color: darkred;
+	font-weight: bolder;
+	text-decoration-line: none;
+}
+
+.content a:hover {
+	text-decoration-line: underline;
+}
+
 .restaurantList {
 	align-self: center;
 	background-color: burlywood;

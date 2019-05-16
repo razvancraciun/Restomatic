@@ -6,5 +6,4 @@
 
 ## To do:
 - Update restaurant logo,menus,times etc..
-- Report reviews
-- Admin list of reported reviews. Delete reviews 
+- Markdown inclusion in restaurant page parsedown

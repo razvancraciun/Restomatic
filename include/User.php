@@ -1,5 +1,4 @@
 <?php
-
 namespace Restomatic;
 
 use Restomatic\Application as App;
@@ -195,12 +194,13 @@ class User {
 	}
 
 	private static function buildRestaurantPage($data) {
-		$html =  '<h1>'.$data['name'].'</h1>';
-		$html .= '<p>'.$data['description'].'</p>';
+		$pd = new Parsedown();
+		$html =  '<h1>'.$pd->text($data['name']).'</h1>';
+		$html .= '<p>'.$pd->text($data['description']).'</p>';
 		$html .= '<h3> Open hours: </h3>';
-		$html .= '<p>'.$data['times'].'</p>';
+		$html .= '<p>'.$pd->text($data['times']).'</p>';
 		$html .= '<h3> Find us at: </h3>';
-		$html .= '<p>'.$data['address'].'</p>';
+		$html .= '<p>'.$pd->text($data['address']).'</p>';
 		$html .= '<h3> Check out our menu <a href="'.APP_ROUTE.$data['menu'].'">here</a>'.'.</h3>';
 		$html .= USER::getReviewList($data['id'],$data['domain']);
 		if(isset($_SESSION['login']) && $_SESSION['login'] && ($_SESSION['roles']=='user' || $_SESSION['roles']=='admin')) { //MAKE SEPARATE FORM CLASS INSTEAD
