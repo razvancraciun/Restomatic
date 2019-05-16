@@ -297,7 +297,11 @@ class User {
 		}
 		$conn=Application::getSingleton()->conexionBD();
 
-		header("Location:".APP_ROUTE);
+		$query=sprintf("DELETE FROM reviews WHERE id='%s'",$id);
+
+		$conn->query($query);
+
+		header("Location:".APP_ROUTE.'reportedReviews.php');
 	}
 }
 

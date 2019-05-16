@@ -1,6 +1,6 @@
 #Deny all direct get requests
 Order deny,allow
 Deny from all
-<FilesMatch ".*\.css|processReviewReport\.php">
+<FilesMatch ".*\.css|processReviewReport\.php|deleteReview\.php">
  Allow from all
 </FilesMatch>
