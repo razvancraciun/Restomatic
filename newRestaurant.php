@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title> Register </title>
+    <title> New Restaurant </title>
     <link rel="stylesheet" type="text/css" href="include/css/index.css">
     <link rel="stylesheet" type="text/css" href="include/css/header.css">
     <link rel="stylesheet" type="text/css" href="include/css/newRestaurant.css">

@@ -121,13 +121,13 @@ class User {
 		if($_SESSION['login']) {
 			$root=$_SERVER['DOCUMENT_ROOT'].APP_ROUTE;
 			$ownerId = $conn->query("SELECT id FROM users WHERE email='".$_SESSION['email']."';")->fetch_assoc()['id'];
-			$id = $conn->query("SELECT nvl(max(id),'0') as id from restaurants");
-			if(!$id) {
-				$id=0;
+			$result = $conn->query("SELECT max(id) as id from restaurants");
+			$id=$result->fetch_assoc()['id'];
+			
+			if($id==null || $id==false) {
+				$id =0;
 			}
-			else {
-				$id=$id->fetch_assoc()['id'];
-			}
+			
 			$id++;
 			$targetDir = 'user/'.$ownerId.'/'.$id;
 			$targetLogo='';

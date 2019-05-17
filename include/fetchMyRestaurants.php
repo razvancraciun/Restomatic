@@ -18,7 +18,7 @@ namespace Restomatic;
     $html.=$res['name']."</a>"
         ."</div>"
         ."<div>"
-        ."<a href='#' class='updateButton'>Update</a>"
+        ."<a href='".APP_ROUTE."updateRestaurant.php?id=".$res['id']."' class='updateButton'>Update</a>"
         ."</div>"
         ."</li>";
  }

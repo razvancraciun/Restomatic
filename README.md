@@ -6,4 +6,3 @@
 
 ## To do:
 - Update restaurant logo,menus,times etc..
-- Markdown inclusion in restaurant page parsedown
