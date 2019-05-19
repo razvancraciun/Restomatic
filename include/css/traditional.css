@@ -1,0 +1,194 @@
+body{
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+
+  background: lightgrey;
+}
+
+#deco1{
+  position: absolute;
+width: 374px;
+height: 468px;
+left: 0px;
+top: 176px;
+
+  z-index: -2;
+
+}
+
+#deco2{
+  position: absolute;
+  width: 330px;
+  left: 889px;
+  top: 597px;
+
+}
+
+#welcome p {
+  position: absolute;
+  width: 671px;
+  height: 228px;
+  left: 270px;
+  top: 420px;
+
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 72px;
+  line-height: 84px;
+
+  color: #000000;
+
+}
+
+#welcome-svg{
+  position: absolute;
+  width: 711px;
+  height: 229px;
+  left: 249px;
+  top: 462px;
+  z-index: -1;
+
+  background: rgba(255, 96, 6, 0.4);
+}
+
+#menu{
+  position: absolute;
+  width: 491px;
+  height: 372px;
+  left: 1429px;
+  top: 138px;
+}
+
+#times{
+  position: absolute;
+  width: 521px;
+  height: 219px;
+  left: 840px;
+  top: 191px;
+
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 48px;
+  line-height: 56px;
+
+  color: #000000;
+}
+
+#address-text{
+  position: absolute;
+  width: 598px;
+  height: 343px;
+  left: 1395px;
+  top: 737px;
+
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 48px;
+  line-height: 56px;
+  text-align: center;
+
+  color: #000000;
+}
+
+#dbox{
+  position: absolute;
+  width: 913px;
+  height: 335px;
+  left: 47px;
+  top: 645px;
+  z-index: -1;
+
+  background: #E5E5E5;
+}
+
+#description{
+  position: absolute;
+  width: 842px;
+  height: 273px;
+  left: 47px;
+  top: 707px;
+
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 48px;
+  line-height: 56px;
+
+  color: #000000;
+
+}
+
+#menu-svg{
+  position: absolute;
+  width: 208px;
+  height: 65px;
+  left: 1712px;
+  top: 491px;
+  z-index: 0;
+
+  background: #E5E5E5;
+}
+
+#menu-text{
+  position: absolute;
+  width: 190px;
+  height: 55px;
+  left: 1721px;
+  top: 470px;
+
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 36px;
+  line-height: 42px;
+  z-index: 1;
+
+  color: #000000;
+}
+
+#address-head{
+  position: absolute;
+width: 438px;
+height: 86px;
+left: 1378px;
+top: 580px;
+
+font-family: Roboto;
+font-style: normal;
+font-weight: normal;
+font-size: 72px;
+line-height: 84px;
+
+border: 1px solid #000000;
+}
+
+#address-svg{
+  position: absolute;
+width: 392px;
+height: 234px;
+left: 1528px;
+top: 675px;
+z-index: -1;
+
+background: rgba(255, 96, 6, 0.4);
+}
+
+#times-head{
+  position: absolute;
+  width: 521px;
+  height: 219px;
+  left: 840px;
+  top: 100px;
+
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 48px;
+  line-height: 56px;
+
+  color: #000000;
+}
